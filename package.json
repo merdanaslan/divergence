@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "ccxt": "^4.4.26",
+    "openai": "^4.71.0",
+    "technicalindicators": "^3.1.0"
+  }
+}

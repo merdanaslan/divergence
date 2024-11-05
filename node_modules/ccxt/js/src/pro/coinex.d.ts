@@ -1,0 +1,37 @@
+import coinexRest from '../coinex.js';
+import type { Int, Str, Strings, OrderBook, Order, Trade, Ticker, Tickers, Balances, Dict, int } from '../base/types.js';
+import Client from '../base/ws/Client.js';
+export default class coinex extends coinexRest {
+    describe(): any;
+    requestId(): any;
+    handleTicker(client: Client, message: any): void;
+    parseWSTicker(ticker: any, market?: any): Ticker;
+    watchBalance(params?: {}): Promise<Balances>;
+    handleBalance(client: Client, message: any): void;
+    parseWsBalance(balance: any, accountType?: any): void;
+    watchMyTrades(symbol?: Str, since?: Int, limit?: Int, params?: {}): Promise<Trade[]>;
+    handleMyTrades(client: Client, message: any): void;
+    handleTrades(client: Client, message: any): void;
+    parseWsTrade(trade: any, market?: any): Trade;
+    watchTicker(symbol: string, params?: {}): Promise<Ticker>;
+    watchTickers(symbols?: Strings, params?: {}): Promise<Tickers>;
+    watchTrades(symbol: string, since?: Int, limit?: Int, params?: {}): Promise<Trade[]>;
+    watchTradesForSymbols(symbols: string[], since?: Int, limit?: Int, params?: {}): Promise<Trade[]>;
+    watchOrderBookForSymbols(symbols: string[], limit?: Int, params?: {}): Promise<OrderBook>;
+    watchOrderBook(symbol: string, limit?: Int, params?: {}): Promise<OrderBook>;
+    handleDelta(bookside: any, delta: any): void;
+    handleDeltas(bookside: any, deltas: any): void;
+    handleOrderBook(client: Client, message: any): void;
+    watchOrders(symbol?: Str, since?: Int, limit?: Int, params?: {}): Promise<Order[]>;
+    handleOrders(client: Client, message: any): void;
+    parseWsOrder(order: any, market?: any): Order;
+    parseWsOrderStatus(status: any): string;
+    watchBidsAsks(symbols?: Strings, params?: {}): Promise<Tickers>;
+    handleBidAsk(client: Client, message: any): void;
+    parseWsBidAsk(ticker: any, market?: any): Ticker;
+    handleMessage(client: Client, message: any): void;
+    handleErrors(code: int, reason: string, url: string, method: string, headers: Dict, body: string, response: any, requestHeaders: any, requestBody: any): any;
+    handleAuthenticationMessage(client: Client, message: any): void;
+    handleSubscriptionStatus(client: Client, message: any): void;
+    authenticate(type: string): Promise<any>;
+}
