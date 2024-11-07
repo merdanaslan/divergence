@@ -3,7 +3,6 @@ const fs = require('fs');
 const { RSI } = require('technicalindicators');
 
 async function fetchOHLCVData() {
-    // Initialize the Binance Futures exchange
     const exchange = new ccxt.binanceusdm({
         enableRateLimit: true,
     });
@@ -11,14 +10,17 @@ async function fetchOHLCVData() {
     try {
         // Define parameters
         const symbol = 'BTC/USDT';
-        const timeframe = '4h';
-        const startDate = new Date('2024-02-26').getTime();
-        const endDate = new Date('2024-11-04').getTime();
+        const timeframe = '1h';
+        const startDate = new Date('2024-11-06').getTime();
+        const endDate = new Date('2024-11-07T12:00:00').getTime();
+        
+        // Calculate start time for RSI (14 candles before actual start)
+        const rsiStartDate = startDate - (14 * 60 * 60 * 1000);
         
         console.log('Fetching data...');
         
         let allCandles = [];
-        let since = startDate;
+        let since = rsiStartDate;
         
         // Fetch all candles in a loop
         while (since < endDate) {
@@ -41,32 +43,38 @@ async function fetchOHLCVData() {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         
-        // Process the data
-        const processedData = allCandles.map(candle => ({
-            timestamp: new Date(candle[0]).toISOString(),
-            open: candle[1],
-            high: candle[2],
-            low: candle[3],
-            close: candle[4],
-            volume: candle[5]
-        }));
+        console.log('Calculating RSI...');
         
-        // Calculate RSI using technicalindicators library
-        const closes = processedData.map(d => d.close);
+        // Calculate RSI using all candles
+        const allCloses = allCandles.map(candle => candle[4]);
         const rsiInput = {
-            values: closes,
+            values: allCloses,
             period: 14
         };
-        const rsiValues = RSI.calculate(rsiInput);
+        const allRsiValues = RSI.calculate(rsiInput);
         
-        // Add RSI to processed data
-        const rsiOffset = processedData.length - rsiValues.length;
-        processedData.forEach((data, index) => {
-            const rsiIndex = index - rsiOffset;
-            data.rsi = rsiIndex >= 0 ? rsiValues[rsiIndex].toFixed(2) : '';
+        // Create a map of timestamp to RSI value
+        const rsiMap = new Map();
+        allCandles.forEach((candle, index) => {
+            if (index >= 14) { // RSI values start after the first 14 candles
+                rsiMap.set(candle[0], allRsiValues[index - 14]);
+            }
         });
         
-        // Save to file without divergence analysis
+        // Process only the data within our target timeframe
+        const processedData = allCandles
+            .filter(candle => candle[0] >= startDate && candle[0] <= endDate)
+            .map(candle => ({
+                timestamp: new Date(candle[0]).toISOString(),
+                open: candle[1],
+                high: candle[2],
+                low: candle[3],
+                close: candle[4],
+                volume: candle[5],
+                rsi: rsiMap.get(candle[0]).toFixed(2)
+            }));
+        
+        // Save to file
         const headers = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'rsi'];
         const csvContent = [
             headers.join(','),
@@ -75,9 +83,9 @@ async function fetchOHLCVData() {
             )
         ].join('\n');
         
-        fs.writeFileSync('btc_usdt_perp_4h_data.csv', csvContent);
-        console.log(`\nData saved to btc_usdt_perp_4h_data.csv`);
-        console.log(`Total candles fetched: ${processedData.length}`);
+        fs.writeFileSync('btc_usdt_perp_1h_data.csv', csvContent);
+        console.log(`\nData saved to btc_usdt_perp_1h_data.csv`);
+        console.log(`Total candles in specified timeframe: ${processedData.length}`);
         
     } catch (error) {
         console.error('Error:', error);

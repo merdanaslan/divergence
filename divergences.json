@@ -1,13 +1,4 @@
 {
-  "divergences": [
-    {
-      "startIndex": 639,
-      "endIndex": 658,
-      "priceStart": 66000,
-      "priceEnd": 65052.4,
-      "rsiStart": 22.34,
-      "rsiEnd": 34.44,
-      "confidence": 0.9
-    }
-  ]
+  "bullishDivergences": 0,
+  "bearishDivergences": 1
 }
