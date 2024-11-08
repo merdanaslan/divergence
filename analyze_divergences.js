@@ -12,10 +12,12 @@ async function analyzeDivergencesWithAI() {
     const rows = csvData.split('\n');
     
     // Parse CSV data
-    const data = rows.slice(1).map(row => {
+    const data = rows.slice(1).map((row, index) => {
         const values = row.split(',');
         return {
+            index,
             timestamp: values[0],
+            time: new Date(values[0]).getTime() / 1000,
             low: parseFloat(values[3]),
             close: parseFloat(values[4]),
             rsi: parseFloat(values[6])
@@ -32,8 +34,28 @@ async function analyzeDivergencesWithAI() {
 
     Return the results in this exact JSON format:
     {
-        "bullishDivergences": number,
-        "bearishDivergences": number
+        "bullishDivergences": [
+            {
+                "startIndex": number,
+                "endIndex": number,
+                "startPrice": number,
+                "endPrice": number,
+                "startRsi": number,
+                "endRsi": number,
+                "confidence": number
+            }
+        ],
+        "bearishDivergences": [
+            {
+                "startIndex": number,
+                "endIndex": number,
+                "startPrice": number,
+                "endPrice": number,
+                "startRsi": number,
+                "endRsi": number,
+                "confidence": number
+            }
+        ]
     }
 
     Data:
@@ -57,12 +79,50 @@ async function analyzeDivergencesWithAI() {
 
         const divergences = JSON.parse(completion.choices[0].message.content);
         
+        // Add time information to divergences
+        divergences.bullishDivergences = divergences.bullishDivergences.map(div => ({
+            ...div,
+            startTime: data[div.startIndex].time,
+            endTime: data[div.endIndex].time,
+            startDate: new Date(data[div.startIndex].timestamp).toLocaleString(),
+            endDate: new Date(data[div.endIndex].timestamp).toLocaleString()
+        }));
+
+        divergences.bearishDivergences = divergences.bearishDivergences.map(div => ({
+            ...div,
+            startTime: data[div.startIndex].time,
+            endTime: data[div.endIndex].time,
+            startDate: new Date(data[div.startIndex].timestamp).toLocaleString(),
+            endDate: new Date(data[div.endIndex].timestamp).toLocaleString()
+        }));
+
         // Save divergences to a JSON file
         fs.writeFileSync('divergences.json', JSON.stringify(divergences, null, 2));
 
-        // Log the results
-        console.log(`Bullish Divergences: ${divergences.bullishDivergences}`);
-        console.log(`Bearish Divergences: ${divergences.bearishDivergences}`);
+        // Log the results with detailed information
+        console.log('\n=== Divergence Analysis Results ===\n');
+        
+        console.log(`Found ${divergences.bullishDivergences.length} bullish divergences:`);
+        divergences.bullishDivergences.forEach((div, index) => {
+            console.log(`\nBullish Divergence #${index + 1}:`);
+            console.log(`Start: ${div.startDate}`);
+            console.log(`End: ${div.endDate}`);
+            console.log(`Price: ${div.startPrice} → ${div.endPrice}`);
+            console.log(`RSI: ${div.startRsi.toFixed(2)} → ${div.endRsi.toFixed(2)}`);
+            console.log(`Confidence: ${(div.confidence * 100).toFixed(1)}%`);
+        });
+
+        console.log('\n----------------------------------------');
+        
+        console.log(`\nFound ${divergences.bearishDivergences.length} bearish divergences:`);
+        divergences.bearishDivergences.forEach((div, index) => {
+            console.log(`\nBearish Divergence #${index + 1}:`);
+            console.log(`Start: ${div.startDate}`);
+            console.log(`End: ${div.endDate}`);
+            console.log(`Price: ${div.startPrice} → ${div.endPrice}`);
+            console.log(`RSI: ${div.startRsi.toFixed(2)} → ${div.endRsi.toFixed(2)}`);
+            console.log(`Confidence: ${(div.confidence * 100).toFixed(1)}%`);
+        });
         
     } catch (error) {
         console.error('Error analyzing divergences with AI:', error);

@@ -1,4 +1,58 @@
 {
-  "bullishDivergences": 0,
-  "bearishDivergences": 1
+  "bullishDivergences": [
+    {
+      "startIndex": 7,
+      "endIndex": 14,
+      "startPrice": 73435.9,
+      "endPrice": 73654,
+      "startRsi": 66.66,
+      "endRsi": 63.54,
+      "confidence": 0.8,
+      "startTime": 1730876400,
+      "endTime": 1730901600,
+      "startDate": "11/6/2024, 8:00:00 AM",
+      "endDate": "11/6/2024, 3:00:00 PM"
+    },
+    {
+      "startIndex": 27,
+      "endIndex": 35,
+      "startPrice": 75062.9,
+      "endPrice": 74776.9,
+      "startRsi": 61.69,
+      "endRsi": 54.82,
+      "confidence": 0.85,
+      "startTime": 1730948400,
+      "endTime": 1730977200,
+      "startDate": "11/7/2024, 4:00:00 AM",
+      "endDate": "11/7/2024, 12:00:00 PM"
+    }
+  ],
+  "bearishDivergences": [
+    {
+      "startIndex": 2,
+      "endIndex": 5,
+      "startPrice": 73078.9,
+      "endPrice": 74781.4,
+      "startRsi": 74.88,
+      "endRsi": 79.09,
+      "confidence": 0.75,
+      "startTime": 1730858400,
+      "endTime": 1730869200,
+      "startDate": "11/6/2024, 3:00:00 AM",
+      "endDate": "11/6/2024, 6:00:00 AM"
+    },
+    {
+      "startIndex": 19,
+      "endIndex": 20,
+      "startPrice": 75817.9,
+      "endPrice": 76104.6,
+      "startRsi": 74.81,
+      "endRsi": 76.01,
+      "confidence": 0.7,
+      "startTime": 1730919600,
+      "endTime": 1730923200,
+      "startDate": "11/6/2024, 8:00:00 PM",
+      "endDate": "11/6/2024, 9:00:00 PM"
+    }
+  ]
 }

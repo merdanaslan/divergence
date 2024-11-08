@@ -121,17 +121,58 @@ async function createChart() {
         rsiUpperLevel.setData(rsiData.map(d => ({ time: d.time, value: 70 })));
         rsiLowerLevel.setData(rsiData.map(d => ({ time: d.time, value: 30 })));
 
-        // Add divergence markers
+        // Add divergence areas and markers
         if (divergences?.bullishDivergences) {
+            // Add markers
             candlestickSeries.setMarkers(
                 divergences.bullishDivergences.map(div => ({
-                    time: div.time,
+                    time: div.endTime,
                     position: 'belowBar',
                     color: '#2196F3',
                     shape: 'arrowUp',
-                    text: 'Bullish Div'
+                    text: `Bullish Div (${div.confidence.toFixed(2)})`
                 }))
             );
+
+            // Add price lines for each divergence
+            divergences.bullishDivergences.forEach(div => {
+                // Add price line connecting the lows
+                candlestickSeries.createPriceLine({
+                    price: div.startPrice,
+                    color: '#2196F3',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    title: 'Bullish Div',
+                    time: div.startTime,
+                });
+                candlestickSeries.createPriceLine({
+                    price: div.endPrice,
+                    color: '#2196F3',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.endTime,
+                });
+
+                // Add RSI lines
+                rsiSeries.createPriceLine({
+                    price: div.startRsi,
+                    color: '#2196F3',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.startTime,
+                });
+                rsiSeries.createPriceLine({
+                    price: div.endRsi,
+                    color: '#2196F3',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.endTime,
+                });
+            });
         }
 
         // Sync the charts
