@@ -123,7 +123,7 @@ async function createChart() {
 
         // Add divergence areas and markers
         if (divergences?.bullishDivergences) {
-            // Add markers
+            // Add markers for bullish divergences
             candlestickSeries.setMarkers(
                 divergences.bullishDivergences.map(div => ({
                     time: div.endTime,
@@ -134,7 +134,7 @@ async function createChart() {
                 }))
             );
 
-            // Add price lines for each divergence
+            // Add price lines for each bullish divergence
             divergences.bullishDivergences.forEach(div => {
                 // Add price line connecting the lows
                 candlestickSeries.createPriceLine({
@@ -167,6 +167,61 @@ async function createChart() {
                 rsiSeries.createPriceLine({
                     price: div.endRsi,
                     color: '#2196F3',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.endTime,
+                });
+            });
+        }
+
+        if (divergences?.bearishDivergences) {
+            // Add markers for bearish divergences
+            const existingMarkers = candlestickSeries.markers() || [];
+            candlestickSeries.setMarkers([
+                ...existingMarkers,
+                ...divergences.bearishDivergences.map(div => ({
+                    time: div.endTime,
+                    position: 'aboveBar',
+                    color: '#FF5252',
+                    shape: 'arrowDown',
+                    text: `Bearish Div (${div.confidence.toFixed(2)})`
+                }))
+            ]);
+
+            // Add price lines for each bearish divergence
+            divergences.bearishDivergences.forEach(div => {
+                // Add price line connecting the highs
+                candlestickSeries.createPriceLine({
+                    price: div.startPrice,
+                    color: '#FF5252',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    title: 'Bearish Div',
+                    time: div.startTime,
+                });
+                candlestickSeries.createPriceLine({
+                    price: div.endPrice,
+                    color: '#FF5252',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.endTime,
+                });
+
+                // Add RSI lines
+                rsiSeries.createPriceLine({
+                    price: div.startRsi,
+                    color: '#FF5252',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    time: div.startTime,
+                });
+                rsiSeries.createPriceLine({
+                    price: div.endRsi,
+                    color: '#FF5252',
                     lineWidth: 2,
                     lineStyle: LightweightCharts.LineStyle.Dotted,
                     axisLabelVisible: true,
